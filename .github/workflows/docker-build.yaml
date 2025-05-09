@@ -8,7 +8,7 @@ jobs:
   build:
     runs-on: ubuntu-latest # 指定运行环境
     steps:
-      - name: Checkout Repository # 下载代码
+      - name: Checkout Repository # 下载代码, @see https://github.com/actions/checkout
         uses: actions/checkout@v4
 
       - name: Prepare # 准备工作
@@ -20,6 +20,7 @@ jobs:
           echo "build_args=VERSION=${VERSION}" >> $GITHUB_OUTPUT
           echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          echo "${GITHUB_OUTPUT}"
 
       - name: Set up QEMU #  设置 QEMU, 跨平台模拟器
         uses: docker/setup-qemu-action@v3
