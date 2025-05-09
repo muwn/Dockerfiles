@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest # 指定运行环境
     steps:
       - name: Checkout Repository # 下载代码
-        uses: actions/checkout@4
+        uses: actions/checkout@v4
 
       - name: Prepare # 准备工作
         id: prepare
