@@ -6,7 +6,7 @@ on:
         description: 'version'
         required: true
         default: '0.61.1'
-  #push:
+  # push:
   #  branches:
   #    - master
 
@@ -26,7 +26,6 @@ jobs:
           echo "build_args=VERSION=${VERSION}" >> $GITHUB_OUTPUT
           echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
-          echo "${GITHUB_OUTPUT}"
 
       - name: Set up QEMU # 使用QEMU添加对更多平台的支持, @see https://github.com/docker/setup-qemu-action
         uses: docker/setup-qemu-action@v3
