@@ -1,23 +1,20 @@
 name: frps
 on:
-  workflow_dispatch: # 手动触发
+  workflow_dispatch:
     inputs:
       version:
         description: 'version'
         required: true
         default: '0.62.1'
-  # push:
-  #  branches:
-  #    - master
 
 jobs:
   build:
-    runs-on: ubuntu-latest # 指定运行环境
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository # 下载代码, @see https://github.com/actions/checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Prepare # 准备工作
+      - name: Prepare
         id: prepare
         run: |
           VERSION=${{ github.event.inputs.version }}
@@ -27,20 +24,20 @@ jobs:
           echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
-      - name: Set up QEMU # 使用QEMU添加对更多平台的支持, @see https://github.com/docker/setup-qemu-action
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
-      - name: Set up Docker Buildx # 设置 Docker Buildx, Docker 多平台构建工具, @see https://github.com/docker/setup-buildx-action
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Login to Docker Hub # 登录 DockerHub, @see https://github.com/docker/login-action
-        if: github.event_name != 'pull_request' # 仅在不是 Pull Request 时执行
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build and push # 构建镜像, @see https://github.com/docker/build-push-action
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: ./${{ steps.prepare.outputs.image-name }}
