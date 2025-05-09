@@ -1,11 +1,11 @@
-name: Build Frps
+name: frps
 on:
   workflow_dispatch: # 手动触发
     inputs:
       version:
         description: 'version'
         required: true
-        default: '0.61.1'
+        default: '0.62.1'
   # push:
   #  branches:
   #    - master
@@ -22,7 +22,7 @@ jobs:
         run: |
           VERSION=${{ github.event.inputs.version }}
           IMAGE_NAME=frps
-          TAGS="muwn/${IMAGE_NAME}:${VERSION},muwn/${IMAGE_NAME}:latest"
+          TAGS="${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${VERSION},${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:latest"
           echo "build_args=VERSION=${VERSION}" >> $GITHUB_OUTPUT
           echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
