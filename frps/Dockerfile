@@ -22,4 +22,4 @@ FROM alpine:3
 COPY --from=builder /release/* /usr/local/bin/
 COPY --from=builder /etc/frp/* /etc/frp/
 
-CMD ["/usr/bin/frps", "-c", "/etc/frp/frps.toml"]
+CMD ["/usr/local/bin/frps", "-c", "/etc/frp/frps.toml"]
