@@ -16,7 +16,7 @@ RUN set -eux && \
     curl -sSL https://github.com/fatedier/frp/archive/refs/tags/v$VERSION.tar.gz | tar xz --strip 1 && \
     go build -v -ldflags "-s -w" -o /release/frps ./cmd/frps && \
     ls /release/frp* | xargs -n1 setcap 'cap_net_bind_service+ep' && \
-    cp ./conf/frps.* /etc/frp/
+    cp ./conf/frps* /etc/frp/
 
 FROM alpine:3
 
