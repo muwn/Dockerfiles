@@ -46,3 +46,12 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           build-args: ${{ steps.prepare.outputs.build_args }}
           tags: ${{ steps.prepare.outputs.tags }}
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          enable-url-completion: true
+          readme-filepath: ./${{ steps.prepare.outputs.image-name }}/README.md
+          repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.prepare.outputs.image-name }}
