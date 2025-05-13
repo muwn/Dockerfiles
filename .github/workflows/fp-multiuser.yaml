@@ -18,7 +18,7 @@ jobs:
         id: prepare
         run: |
           VERSION=${{ github.event.inputs.version }}
-          IMAGE_NAME=frps
+          IMAGE_NAME=fp-multiuser
           TAGS="${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${VERSION},${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:latest"
           echo "build_args=VERSION=${VERSION}" >> $GITHUB_OUTPUT
           echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
