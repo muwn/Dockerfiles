@@ -26,4 +26,4 @@ RUN set -eux; \
 COPY --from=builder /release/* /usr/local/bin/
 COPY --from=builder /etc/frp/* /etc/frp/
 
-CMD ["/usr/local/bin/fp-multiuser", "-c", "/etc/frp/tokens"]
+CMD ["/usr/local/bin/fp-multiuser", "-f", "/etc/frp/tokens"]
