@@ -12,9 +12,9 @@ If you wish to adapt the default configuration, use something like the following
 
 ```shell
 # Default
-docker run --rm muwn/frps:latest cat /etc/frp/frps.toml > frps.toml
+docker run --rm muwn/frps:latest cat /etc/frp/frps.toml > ./volume/frp/frps.toml
 # Full Example
-docker run --rm muwn/frps:latest cat /etc/frp/frps_full_example.toml > frps_full_example.toml
+docker run --rm muwn/frps:latest cat /etc/frp/frps_full_example.toml > ./volume/frp/frps_full_example.toml
 ```
 
 ### Mount your configuration file
