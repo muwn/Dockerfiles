@@ -26,4 +26,4 @@ RUN set -eux; \
 COPY --from=builder /release/* /usr/local/bin/
 COPY --from=builder /etc/fp-multiuser/* /etc/fp-multiuser/
 
-CMD ["/usr/local/bin/fp-multiuser", "-f", "/etc/fp-multiuser/tokens"]
+CMD ["/usr/local/bin/fp-multiuser", "-l", "0.0.0.0:7200", "-f", "/etc/fp-multiuser/tokens"]
