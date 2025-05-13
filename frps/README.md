@@ -1,5 +1,3 @@
-# frps
-
 # How to use this image
 
 ## Start an instance
@@ -8,15 +6,15 @@
 docker run -d --name frps -p 7000:7010 muwn/frps:latest
 ```
 
-## if you want to use your own configuration
+## if youer want to use your own configuration
 
 If you wish to adapt the default configuration, use something like the following to get it from a frps container:
 
 ```shell
 # Default
-docker run --rm muwn/frps:latest cat /etc/frp/frps.toml > ./volume/frp/frps.toml
+docker run --rm muwn/frps:latest cat /etc/frp/frps.toml > frps.toml
 # Full Example
-docker run --rm muwn/frps:latest cat /etc/frp/frps_full_example.toml > ./volume/frp/frps_full_example.toml
+docker run --rm muwn/frps:latest cat /etc/frp/frps_full_example.toml > frps_full_example.toml
 ```
 
 ### Mount your configuration file
@@ -28,7 +26,6 @@ docker run -d --name frps -p 7000:7010 -v ./volume/frp/frps.toml:/ect/frp/frps.t
 
 ```shell
 wget https://raw.githubusercontent.com/muwn/Dockerfiles/refs/heads/master/frps/docker-compose.yaml -O docker-compose.yaml
-docker-compose up -d
 ```
 
 ## If you want to use multiple users
