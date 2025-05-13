@@ -1,17 +1,36 @@
-
 # frps
 
-# Use
+# How to use this image
 
-## Use Docker
+## Start an instance
 
+``` shell
+docker run -d --name frps -p 7000:7010 muwn/frps:latest
+```
+
+## if you want to use your own configuration
+
+If you wish to adapt the default configuration, use something like the following to get it from a frps container:
+
+```shell
+# Default
+docker run --rm muwn/frps:latest cat /etc/frp/frps.toml > ./volume/frp/frps.toml
+# Full Example
+docker run --rm muwn/frps:latest cat /etc/frp/frps_full_example.toml > ./volume/frp/frps_full_example.toml
+```
+
+### Mount your configuration file
 ``` shell
 docker run -d --name frps -p 7000:7010 -v ./volume/frp/frps.toml:/ect/frp/frps.toml muwn/frps:latest
 ```
 
-## Use Docker Compose
+## via [docker compose](https://github.com/docker/compose)
 
 ```shell
-wget https://raw.githubusercontent.com/muwn/Dockerfiles/refs/heads/master/frps/docker-compose.yml
+wget https://raw.githubusercontent.com/muwn/Dockerfiles/refs/heads/master/frps/docker-compose.yaml -O docker-compose.yaml
 docker-compose up -d
 ```
+
+## If you want to use multiple users
+
+[fp-multiuser](https://hub.docker.com/r/muwn/fp-multiuser)
