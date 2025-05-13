@@ -15,7 +15,7 @@ admin=admin
 user1=user1
 EOF
 
-docker run -d --name fp-multiuser -p 7200:7200 -v ./volume/frp/tokens:/etc/frp/tokens muwn/fp-multiuser:latest
+docker run -d --name fp-multiuser -p 7200:7200 -v ./volume/fp-multiuser/tokens:/etc/fp-multiuser/tokens muwn/fp-multiuser:latest
 ```
 
 ## via [docker compose](https://github.com/docker/compose)

@@ -34,7 +34,7 @@ services:
     environment:
       - TZ=Asia/Shanghai
     volumes:
-      - ./volumes/fp-multiuser/:/etc/frp/
+      - ./volumes/fp-multiuser/:/etc/fp-multiuser/
     deploy:
       resources:
         limits:
