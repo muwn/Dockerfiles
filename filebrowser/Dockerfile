@@ -17,7 +17,7 @@ RUN set -eux && \
     cd frontend && npm install -g pnpm && npm install && npm run build && cd - && \
     VERSION_HASH=$(git rev-parse HEAD) && \
     MODULE=$(env GO111MODULE=on go list -m) && \
-    GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -v -ldflags "-s -w -X ${MODULE}/version.Version=${VERSION} -X ${MODULE}/version.CommitSHA=${VERSION_HASH}" -o /release/filebrowser && \
+    go build -v -ldflags "-s -w -X ${MODULE}/version.Version=${VERSION} -X ${MODULE}/version.CommitSHA=${VERSION_HASH}" -o /release/filebrowser && \
     cp docker_config.json /etc/filebrowser/settings.json && \
     ls /release/filebrowser* | xargs -n1 setcap 'cap_net_bind_service+ep'
 
