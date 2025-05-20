@@ -31,4 +31,4 @@ services:
           memory: 10M
     healthcheck:
       <<: *default-healthcheck
-      test: [ "CMD-SHELL","curl -s http://127.0.0.1:80/health > /dev/null 2>&1" ]
+      test: [ "CMD-SHELL","nc -z 127.0.0.1 80" ]
