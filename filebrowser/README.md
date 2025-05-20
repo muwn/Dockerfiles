@@ -12,12 +12,13 @@ If you wish to adapt the default configuration, use something like the following
 
 ```shell
 # Default
-docker run --rm muwn/filebrowser:latest cat /etc/filebrowser/settings.json > ./volume/filebrowser/settings.json
+mkdir -p ./volumes/filebrowser
+docker run --rm muwn/filebrowser:latest cat /etc/filebrowser/settings.json > ./volumes/config/settings.json
 ```
 
 ### Mount your configuration file
 ``` shell
-docker run -d --name filebrowser -p 8080:80 -v ./volume/filebrowser/settings.json:/ect/filebrowser/settings.json muwn/filebrowser:latest
+docker run -d --name filebrowser -p 8080:80 -v ./volumes/filebrowser/settings.json:/ect/filebrowser/settings.json muwn/filebrowser:latest
 ```
 
 ## via [docker compose](https://github.com/docker/compose)

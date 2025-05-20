@@ -11,15 +11,16 @@ docker run -d --name frps -p 7000:7010 muwn/frps:latest
 If you wish to adapt the default configuration, use something like the following to get it from a frps container:
 
 ```shell
+mkdir -p ./volumes/frp
 # Default
-docker run --rm muwn/frps:latest cat /etc/frp/frps.toml > ./volume/frp/frps.toml
+docker run --rm muwn/frps:latest cat /etc/frp/frps.toml > ./volumes/frp/frps.toml
 # Full Example
-docker run --rm muwn/frps:latest cat /etc/frp/frps_full_example.toml > ./volume/frp/frps_full_example.toml
+docker run --rm muwn/frps:latest cat /etc/frp/frps_full_example.toml > ./volumes/frp/frps_full_example.toml
 ```
 
 ### Mount your configuration file
 ``` shell
-docker run -d --name frps -p 7000:7010 -v ./volume/frp/frps.toml:/ect/frp/frps.toml muwn/frps:latest
+docker run -d --name frps -p 7000:7010 -v ./volumes/frp/frps.toml:/ect/frp/frps.toml muwn/frps:latest
 ```
 
 ## via [docker compose](https://github.com/docker/compose)

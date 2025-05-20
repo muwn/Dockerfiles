@@ -10,19 +10,21 @@ docker run -d --name fp-multiuser -p 7200:7200 muwn/fp-multiuser:latest
 
 ### Mount your configuration file
 ``` shell
-cat > ./volume/fp-multiuser/tokens <<"EOF"
+mkdir -p ./volumes/fp-multiuser
+cat > ./volumes/fp-multiuser/tokens <<"EOF"
 admin=admin
 user1=user1
 EOF
 
-docker run -d --name fp-multiuser -p 7200:7200 -v ./volume/fp-multiuser/tokens:/etc/fp-multiuser/tokens muwn/fp-multiuser:latest
+docker run -d --name fp-multiuser -p 7200:7200 -v ./volumes/fp-multiuser/tokens:/etc/fp-multiuser/tokens muwn/fp-multiuser:latest
 ```
 
 ## via [docker compose](https://github.com/docker/compose)
 
 ```shell
+mkdir -p ./volumes/frp
 # frps.toml Additional content 
-cat >> ./volume/frp/frps.toml <<"EOF"
+cat >> ./volumes/frp/frps.toml <<"EOF"
 
 # multiuser plugin
 [[httpPlugins]]

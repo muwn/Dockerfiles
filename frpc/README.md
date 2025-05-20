@@ -11,15 +11,16 @@ docker run -d --name frpc -p 7000:7010 muwn/frpc:latest
 If you wish to adapt the default configuration, use something like the following to get it from a frpc container:
 
 ```shell
+mkdir -p ./volumes/frp
 # Default
-docker run --rm muwn/frpc:latest cat /etc/frp/frpc.toml > ./volume/frp/frpc.toml
+docker run --rm muwn/frpc:latest cat /etc/frp/frpc.toml > ./volumes/frp/frpc.toml
 # Full Example
-docker run --rm muwn/frpc:latest cat /etc/frp/frpc_full_example.toml > ./volume/frp/frpc_full_example.toml
+docker run --rm muwn/frpc:latest cat /etc/frp/frpc_full_example.toml > ./volumes/frp/frpc_full_example.toml
 ```
 
 ### Mount your configuration file
 ``` shell
-docker run -d --name frpc -p 7000:7010 -v ./volume/frp/frpc.toml:/ect/frp/frpc.toml muwn/frpc:latest
+docker run -d --name frpc -p 7000:7010 -v ./volumes/frp/frpc.toml:/ect/frp/frpc.toml muwn/frpc:latest
 ```
 
 ## via [docker compose](https://github.com/docker/compose)
