@@ -24,5 +24,6 @@ docker run -d --name filebrowser -p 8080:80 -v ./volumes/filebrowser/settings.js
 ## via [docker compose](https://github.com/docker/compose)
 
 ```shell
+mkdir -p volumes/data/{branding/img/icons,files}
 wget https://raw.githubusercontent.com/muwn/Dockerfiles/refs/heads/master/filebrowser/docker-compose.yaml -O docker-compose.yaml
 ```

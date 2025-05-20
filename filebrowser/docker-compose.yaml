@@ -10,17 +10,14 @@ services:
     image: muwn/filebrowser:latest
     restart: unless-stopped
     environment:
-      - FB_PORT=80
-      - FB_ADDRESS=
-      - FB_LOG=stdout
-      - FB_DATABASE=/database/filebrowser.db
-      - FB_ROOT=/srv
+      - FB_DATABASE=/data/database/filebrowser.db
+      - FB_ROOT=/data/files
       - TZ=Asia/Shanghai
     ports:
       - "8080:80"
     volumes:
       - ./volumes/config/:/etc/filebrowser/
-      - ./volumes/data/:/database/
+      - ./volumes/data/:/data/
     deploy:
       resources:
         limits:
