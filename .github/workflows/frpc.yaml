@@ -1,0 +1,57 @@
+name: frpc
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version'
+        required: true
+        default: '0.62.1'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Prepare
+        id: prepare
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          IMAGE_NAME=frpc
+          TAGS="${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${VERSION},${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:latest"
+          echo "build_args=VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ steps.prepare.outputs.image-name }}
+          file: ./${{ steps.prepare.outputs.image-name }}/Dockerfile
+          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x
+          push: ${{ github.event_name != 'pull_request' }}
+          build-args: ${{ steps.prepare.outputs.build_args }}
+          tags: ${{ steps.prepare.outputs.tags }}
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          enable-url-completion: true
+          readme-filepath: ./${{ steps.prepare.outputs.image-name }}/README.md
+          repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.prepare.outputs.image-name }}
