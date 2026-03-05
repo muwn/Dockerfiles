@@ -44,7 +44,7 @@ jobs:
           DOCKERFILE=${{ matrix.dockerfile }}
           VERSION_SUFFIX=$(echo "${DOCKERFILE}" | sed 's/Dockerfile-//')
           TAGS="${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${VERSION}-${VERSION_SUFFIX}"
-          echo "build_args=VERSION=${FULL_VERSION}" >> $GITHUB_OUTPUT
+          echo "build_args=version=${FULL_VERSION}" >> $GITHUB_OUTPUT
           echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
           echo "dockerfile=${DOCKERFILE}" >> $GITHUB_OUTPUT
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
