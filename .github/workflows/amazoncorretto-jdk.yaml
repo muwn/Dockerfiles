@@ -1,15 +1,35 @@
-name: frpc
+name: amazoncorretto
 on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'version'
+        description: 'version' # see https://github.com/corretto/corretto-docker/blob/main/21/jdk/debian/Dockerfile
         required: true
         default: '21.0.10.7-1'
 
 jobs:
+  get-dockerfiles:
+    runs-on: ubuntu-latest
+    outputs:
+      dockerfiles: ${{ steps.list-dockerfiles.outputs.dockerfiles }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: List all Dockerfile-*
+        id: list-dockerfiles
+        run: |
+          IMAGE_NAME=amazoncorretto
+          DOCKERFILES=$(find ./${IMAGE_NAME} -name 'Dockerfile*' -type f | sed 's|.*/||' | sort | jq -R -s -c 'split("\n")[:-1]')
+          echo "dockerfiles=${DOCKERFILES}" >> $GITHUB_OUTPUT
+
   build:
     runs-on: ubuntu-latest
+    needs: get-dockerfiles
+    strategy:
+      matrix:
+        dockerfile: ${{ fromJson(needs.get-dockerfiles.outputs.dockerfiles) }}
+      fail-fast: true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -17,11 +37,16 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          version=${{ github.event.inputs.version }}
+          FULL_VERSION=${{ github.event.inputs.version }}
+          # 截取主版本号 (如 21.0.10.7-1 -> 21.0.10)
+          VERSION=$(echo "${FULL_VERSION}" | cut -d'.' -f1-3)
           IMAGE_NAME=amazoncorretto
-          TAGS="${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${VERSION},${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:latest"
-          echo "build_args=VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          DOCKERFILE=${{ matrix.dockerfile }}
+          VERSION_SUFFIX=$(echo "${DOCKERFILE}" | sed 's/Dockerfile-//')
+          TAGS="${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${VERSION}-${VERSION_SUFFIX}"
+          echo "build_args=VERSION=${FULL_VERSION}" >> $GITHUB_OUTPUT
           echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "dockerfile=${DOCKERFILE}" >> $GITHUB_OUTPUT
           echo "tags=${TAGS}" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
@@ -40,7 +65,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: ./${{ steps.prepare.outputs.image-name }}
-          file: ./${{ steps.prepare.outputs.image-name }}/Dockerfile-bullseye-slim
+          file: ./${{ steps.prepare.outputs.image-name }}/${{ steps.prepare.outputs.dockerfile }}
           platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x
           push: true
           build-args: ${{ steps.prepare.outputs.build_args }}
