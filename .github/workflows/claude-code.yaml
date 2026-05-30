@@ -7,11 +7,18 @@ on:
         required: true
         default: '1.1.0'
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.version }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -21,9 +28,13 @@ jobs:
         run: |
           VERSION=${{ github.event.inputs.version }}
           IMAGE_NAME=claude-code
-          TAGS="${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${VERSION},${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:latest"
           echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
-          echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+          {
+            echo "tags<<EOF"
+            echo "${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${VERSION}"
+            echo "${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:latest"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
