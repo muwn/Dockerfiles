@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:24-alpine
 
 ENV CLAUDE_GLOBAL_PREFIX=/opt/claude-global \
     CLAUDE_CONFIG_HOME=/root/.claude \
