@@ -9,10 +9,8 @@ ENV HOME=/home/cc \
 
 RUN set -eux; \
     apk add --no-cache bash git openssh-client ca-certificates; \
-    deluser node; \
-    delgroup node; \
-    addgroup -g 1000 -S cc; \
-    adduser -u 1000 -S -G cc -h /home/cc cc; \
+    addgroup -g 1001 -S cc; \
+    adduser -u 1001 -S -G cc -h /home/cc cc; \
     # 预创建持久化目录并统一赋权, 避免首次挂载空卷时出现非 root 用户写入失败
     mkdir -p "$CLAUDE_GLOBAL_PREFIX" "$CLAUDE_CONFIG_HOME" "$HOME/.cc-connect" /workspace; \
     chown -R cc:cc "$HOME" /workspace
