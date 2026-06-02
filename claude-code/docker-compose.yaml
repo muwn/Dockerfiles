@@ -9,7 +9,7 @@ services:
     container_name: claude-code
     image: muwn/claude-code:latest
     restart: unless-stopped
-    user: "1000:1000"
+    user: "1001:1001"
     command: ["sh", "-c", "cc-connect"]
     environment:
       - TZ=Asia/Shanghai
