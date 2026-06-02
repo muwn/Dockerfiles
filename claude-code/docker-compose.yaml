@@ -9,13 +9,12 @@ services:
     container_name: claude-code
     image: muwn/claude-code:latest
     restart: unless-stopped
-    command: ["sh", "-c", "tail -f /dev/null"]
+    user: "1000:1000"
+    command: ["sh", "-c", "cc-connect"]
     environment:
       - TZ=Asia/Shanghai
     volumes:
-      - ./volumes/npm-global/:/home/cc/.local/
-      - ./volumes/claude/:/home/cc/.claude/
-      - ./volumes/cc-connect/:/home/cc/.cc-connect/
+      - ./volumes/cc/:/home/cc/
       - ./volumes/workspace/:/workspace/
     healthcheck:
       <<: *default-healthcheck
