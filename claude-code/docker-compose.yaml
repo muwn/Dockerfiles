@@ -5,11 +5,27 @@ x-default-healthcheck: &default-healthcheck
   start_period: 10s
 
 services:
+  claude-code-init:
+    image: alpine:3
+    command:
+      - sh
+      - -c
+      - |
+        mkdir -p /mnt/cc /mnt/workspace
+        chown -R 1001:1001 /mnt/cc /mnt/workspace
+    volumes:
+      - ./volumes/cc/:/mnt/cc/
+      - ./volumes/workspace/:/mnt/workspace/
+    restart: "no"
+
   claude-code:
     container_name: claude-code
     image: muwn/claude-code:latest
     restart: unless-stopped
     user: "1001:1001"
+    depends_on:
+      claude-code-init:
+        condition: service_completed_successfully
     command: ["sh", "-c", "cc-connect"]
     environment:
       - TZ=Asia/Shanghai
