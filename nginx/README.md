@@ -170,3 +170,58 @@ docker run -d \
 这样容器内的日志会写入宿主机 `./logs/`。
 
 如果同时需要让访问日志继续进入 `docker logs`，请额外挂载上面的 `http.conf` 和 `stream.stream`。
+
+## 宿主机 logrotate 示例
+
+如果你已经把日志目录挂载到宿主机，最简单的做法是在宿主机上配置 `logrotate`。
+
+例如，把下面的内容保存为：
+
+```text
+/etc/logrotate.d/docker-nginx
+```
+
+示例配置：
+
+```conf
+/path/to/logs/*.log {
+    daily
+    rotate 7
+    missingok
+    notifempty
+    compress
+    delaycompress
+    dateext
+    copytruncate
+}
+```
+
+字段含义：
+
+- `daily`：每天轮转一次
+- `rotate 7`：最多保留 7 份历史日志
+- `compress`：对历史日志进行压缩
+- `delaycompress`：从下一次轮转开始压缩，避免刚切分就压缩最新旧文件
+- `copytruncate`：先复制再清空原文件，避免轮转时需要容器内显式 reopen 日志文件
+
+如果你希望使用更稳妥的方式，而不是 `copytruncate`，也可以改成下面这种：
+
+```conf
+/path/to/logs/*.log {
+    daily
+    rotate 7
+    missingok
+    notifempty
+    compress
+    delaycompress
+    dateext
+    sharedscripts
+    postrotate
+        docker exec nginx nginx -s reopen >/dev/null 2>&1 || true
+    endscript
+}
+```
+
+这种方式更适合高写入日志场景，因为它会让 Nginx 主动重新打开日志文件。
+
+如果你的容器名不是 `nginx`，请把上面的 `docker exec nginx` 改成实际容器名。
