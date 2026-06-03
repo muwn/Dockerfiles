@@ -68,9 +68,9 @@ jobs:
           push: true
           tags: ${{ steps.prepare.outputs.tags }}
           labels: ${{ steps.prepare.outputs.labels }}
-          # 为 claude-code 单独隔离缓存作用域，避免与其他镜像工作流相互挤占缓存
-          cache-from: type=gha,scope=claude-code
-          cache-to: type=gha,mode=max,scope=claude-code
+          # 按镜像名隔离缓存作用域，便于复用相同 workflow 到其他镜像目录
+          cache-from: type=gha,scope=${{ steps.prepare.outputs.image-name }}
+          cache-to: type=gha,mode=max,scope=${{ steps.prepare.outputs.image-name }}
 
       - name: Docker Hub Description
         uses: peter-evans/dockerhub-description@v4
