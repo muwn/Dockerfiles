@@ -1,0 +1,80 @@
+name: nginx
+run-name: Build nginx:${{ inputs.version }}
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version'
+        required: true
+        default: '1.0.0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.version }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and push nginx:${{ github.event.inputs.version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Prepare
+        id: prepare
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          IMAGE_NAME=nginx
+          echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          {
+            echo "tags<<EOF"
+            echo "${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${VERSION}"
+            echo "${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:latest"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+          {
+            echo "labels<<EOF"
+            echo "org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}"
+            echo "org.opencontainers.image.version=${VERSION}"
+            echo "org.opencontainers.image.revision=${{ github.sha }}"
+            echo "EOF"
+          } >> $GITHUB_OUTPUT
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: ./${{ steps.prepare.outputs.image-name }}
+          file: ./${{ steps.prepare.outputs.image-name }}/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.prepare.outputs.tags }}
+          labels: ${{ steps.prepare.outputs.labels }}
+          cache-from: type=gha,scope=${{ steps.prepare.outputs.image-name }}
+          cache-to: type=gha,mode=max,scope=${{ steps.prepare.outputs.image-name }}
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          enable-url-completion: true
+          readme-filepath: ./${{ steps.prepare.outputs.image-name }}/README.md
+          repository: ${{ secrets.DOCKERHUB_USERNAME }}/${{ steps.prepare.outputs.image-name }}
