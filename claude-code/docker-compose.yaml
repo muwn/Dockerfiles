@@ -11,7 +11,9 @@ services:
       - sh
       - -c
       - |
-        mkdir -p /mnt/cc /mnt/workspace
+        mkdir -p /mnt/cc/.claude /mnt/cc/.cc-connect /mnt/workspace
+        [ -f /mnt/cc/.claude/settings.json ] || touch /mnt/cc/.claude/settings.json
+        [ -f /mnt/cc/.cc-connect/config.toml ] || touch /mnt/cc/.cc-connect/config.toml
         chown -R 1001:1001 /mnt/cc /mnt/workspace
     volumes:
       - ./volumes/cc/:/mnt/cc/
