@@ -37,6 +37,7 @@ stream {
                      '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
 
     access_log /var/log/nginx/tcp-access.log main;
+    access_log /dev/stdout main;
 
     # see https://nginx.org/en/docs/http/ngx_http_log_module.html#open_log_file_cache
     open_log_file_cache max=1000 inactive=20s valid=1m min_uses=2;
@@ -47,9 +48,10 @@ EOF
     cat /tmp/nginx-stream.conf >> /etc/nginx/nginx.conf; \
     rm -f /tmp/nginx-stream.conf
 
-# 关闭 Nginx 版本信息
+# 移除官方镜像默认日志软链接，改为真实文件
 RUN set -eux; \
-    sed -i '/http {/a\    server_tokens off;' /etc/nginx/nginx.conf
+    rm -f /var/log/nginx/access.log /var/log/nginx/error.log; \
+    touch /var/log/nginx/access.log /var/log/nginx/error.log
 
 # 清理缓存
 RUN set -eux; \
