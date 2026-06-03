@@ -29,24 +29,22 @@ RUN set -eux; \
 
 # 添加 stream 支持，默认读取 /etc/nginx/conf.d/*.stream
 RUN set -eux; \
-    cat > /tmp/nginx-stream.conf <<'EOF' && \
-stream {
-    # see https://nginx.org/en/docs/varindex.html
-    log_format main '$remote_addr [$time_local] '
-                     '$protocol $status $bytes_sent $bytes_received '
-                     '$session_time "$upstream_addr" '
-                     '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
-
-    access_log /var/log/nginx/tcp-access.log main;
-
-    # see https://nginx.org/en/docs/http/ngx_http_log_module.html#open_log_file_cache
-    open_log_file_cache max=1000 inactive=20s valid=1m min_uses=2;
-
-    include /etc/nginx/conf.d/*.stream;
-}
-EOF
-    cat /tmp/nginx-stream.conf >> /etc/nginx/nginx.conf; \
-    rm -f /tmp/nginx-stream.conf
+    printf '%s\n' \
+    'stream {' \
+    '    # see https://nginx.org/en/docs/varindex.html' \
+    "    log_format main '\$remote_addr [\$time_local] '" \
+    "                     '\$protocol \$status \$bytes_sent \$bytes_received '" \
+    "                     '\$session_time \"\$upstream_addr\" '" \
+    "                     '\"\$upstream_bytes_sent\" \"\$upstream_bytes_received\" \"\$upstream_connect_time\"';" \
+    '' \
+    '    access_log /var/log/nginx/tcp-access.log main;' \
+    '' \
+    '    # see https://nginx.org/en/docs/http/ngx_http_log_module.html#open_log_file_cache' \
+    '    open_log_file_cache max=1000 inactive=20s valid=1m min_uses=2;' \
+    '' \
+    '    include /etc/nginx/conf.d/*.stream;' \
+    '}' \
+    >> /etc/nginx/nginx.conf
 
 # 为错误日志显式增加 stderr 输出，避免挂载 /var/log/nginx 后丢失 docker logs
 RUN set -eux; \
