@@ -1,0 +1,2 @@
+# 让 Nginx 控制台输出访问日志
+access_log /dev/stdout main;

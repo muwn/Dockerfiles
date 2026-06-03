@@ -37,7 +37,6 @@ stream {
                      '"$upstream_bytes_sent" "$upstream_bytes_received" "$upstream_connect_time"';
 
     access_log /var/log/nginx/tcp-access.log main;
-    access_log /dev/stdout main;
 
     # see https://nginx.org/en/docs/http/ngx_http_log_module.html#open_log_file_cache
     open_log_file_cache max=1000 inactive=20s valid=1m min_uses=2;
@@ -47,6 +46,10 @@ stream {
 EOF
     cat /tmp/nginx-stream.conf >> /etc/nginx/nginx.conf; \
     rm -f /tmp/nginx-stream.conf
+
+# 为错误日志显式增加 stderr 输出，避免挂载 /var/log/nginx 后丢失 docker logs
+RUN set -eux; \
+    sed -i '/error_log /a\error_log /dev/stderr notice;' /etc/nginx/nginx.conf
 
 # 移除官方镜像默认日志软链接，改为真实文件
 RUN set -eux; \
