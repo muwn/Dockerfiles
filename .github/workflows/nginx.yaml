@@ -1,23 +1,23 @@
 name: nginx
-run-name: Build nginx:${{ inputs.version }}
+run-name: Build nginx:${{ inputs.nginx_version }}
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: 'version'
+      nginx_version:
+        description: 'nginx version'
         required: true
-        default: '1.0.0'
+        default: 'latest'
 
 permissions:
   contents: read
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.version }}
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.event.inputs.nginx_version }}
   cancel-in-progress: true
 
 jobs:
   build:
-    name: Build and push nginx:${{ github.event.inputs.version }}
+    name: Build and push nginx:${{ github.event.inputs.nginx_version }}
     runs-on: ubuntu-latest
     timeout-minutes: 60
     env:
@@ -29,19 +29,21 @@ jobs:
       - name: Prepare
         id: prepare
         run: |
-          VERSION=${{ github.event.inputs.version }}
+          NGINX_VERSION=${{ github.event.inputs.nginx_version }}
           IMAGE_NAME=nginx
           echo "image-name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+          echo "build-args=NGINX_VERSION=${NGINX_VERSION}" >> $GITHUB_OUTPUT
           {
             echo "tags<<EOF"
-            echo "${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${VERSION}"
+            echo "${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:${NGINX_VERSION}"
             echo "${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:latest"
             echo "EOF"
           } >> $GITHUB_OUTPUT
           {
             echo "labels<<EOF"
             echo "org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}"
-            echo "org.opencontainers.image.version=${VERSION}"
+            echo "org.opencontainers.image.version=${NGINX_VERSION}"
+            echo "org.opencontainers.image.base.name=nginx:${NGINX_VERSION}"
             echo "org.opencontainers.image.revision=${{ github.sha }}"
             echo "EOF"
           } >> $GITHUB_OUTPUT
@@ -65,6 +67,7 @@ jobs:
           file: ./${{ steps.prepare.outputs.image-name }}/Dockerfile
           platforms: linux/amd64,linux/arm64
           push: true
+          build-args: ${{ steps.prepare.outputs.build-args }}
           tags: ${{ steps.prepare.outputs.tags }}
           labels: ${{ steps.prepare.outputs.labels }}
           cache-from: type=gha,scope=${{ steps.prepare.outputs.image-name }}

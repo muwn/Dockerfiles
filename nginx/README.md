@@ -2,7 +2,7 @@
 
 ## 这是什么
 
-这个目录提供了一个基于官方 `nginx:latest` 的自定义镜像。
+这个目录提供了一个基于官方 `nginx` 镜像的自定义镜像，构建时可以指定基础镜像版本。
 
 在保留官方默认配置结构的基础上，这个镜像额外做了几件事：
 
@@ -32,9 +32,36 @@
 
 ## 构建镜像
 
+默认使用官方 `nginx:latest` 作为基础镜像：
+
 ```shell
 docker build -t muwn/nginx:latest ./nginx
 ```
+
+如果你希望显式指定基础镜像版本，可以传入 `NGINX_VERSION`：
+
+```shell
+docker build \
+  --build-arg NGINX_VERSION=1.28.0 \
+  -t muwn/nginx:1.28.0 \
+  ./nginx
+```
+
+## GitHub Actions 构建
+
+仓库里的 `nginx` workflow 只保留一个手动输入参数：
+
+- `nginx_version`：上游基础镜像版本，例如 `latest`、`1.28.0`
+
+这个值会同时作为：
+
+- `Dockerfile` 的 `NGINX_VERSION` 构建参数
+- 你发布到 Docker Hub 的镜像版本号
+
+例如当你填写 `1.28.0` 时，workflow 会构建：
+
+- 基础镜像：`nginx:1.28.0`
+- 目标镜像：`muwn/nginx:1.28.0`
 
 ## 快速启动
 

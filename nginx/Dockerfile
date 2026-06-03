@@ -1,4 +1,5 @@
-FROM nginx:latest
+ARG NGINX_VERSION=latest
+FROM nginx:${NGINX_VERSION}
 
 ENV TZ=Asia/Shanghai \
     LANG=C.UTF-8
