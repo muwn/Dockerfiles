@@ -1,0 +1,21 @@
+x-default-healthcheck: &default-healthcheck
+  interval: 30s
+  timeout: 5s
+  retries: 2
+  start_period: 10s
+
+services:
+  nginx:
+    image: muwn/nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./volumes/conf.d/:/etc/nginx/conf.d/
+      - ./volumes/logs/:/var/log/nginx/
+      - ./volumes/cache/:/var/cache/nginx/
+    healthcheck:
+      <<: *default-healthcheck
+      test: ["CMD-SHELL", "pgrep nginx >/dev/null"]
