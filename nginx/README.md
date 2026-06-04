@@ -88,18 +88,14 @@ docker compose down
 
 ## 健康检查
 
-当前 `docker-compose.yaml` 已内置健康检查，策略是只检查 `nginx` 进程是否存活：
+当前 `docker-compose.yaml` 已内置健康检查，策略是访问容器内的 HTTP 端口：
 
 ```yaml
 healthcheck:
-  test: ["CMD-SHELL", "pgrep nginx >/dev/null"]
+  test: ["CMD-SHELL", "curl -s http://127.0.0.1:80 > /dev/null 2>&1"]
 ```
 
-这个检查方式更适合调试场景：
-
-- 不会像 `nginx -t` 一样对配置改动过于敏感
-- 只能说明主进程仍然存活
-- 不能替代配置正确性校验
+这个检查方式会直接验证 HTTP 服务是否已经起来，但它只覆盖容器内的 `80` 端口，不替代完整的配置正确性校验。
 
 ## 日志与缓存目录
 
