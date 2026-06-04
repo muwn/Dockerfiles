@@ -117,10 +117,10 @@ docker exec -it nginx sh
 
 它们的用途分别是：
 
-- `http.conf`：关闭 `server_tokens`，并让 HTTP access log 输出到 `/dev/stdout`
+- `http.conf`：定义 HTTP 层的基础限流配置，以及可复用的 OSS 本地代理缓存区
 - `stream.stream`：让 stream access log 输出到 `/dev/stdout`
 
-如果你希望访问日志同时进入 `docker logs`，可以把它们挂载到 `/etc/nginx/conf.d/` 中。
+如果你希望启用对应能力，可以把它们挂载到 `/etc/nginx/conf.d/` 中。
 
 示例：
 
@@ -131,6 +131,64 @@ docker run -d \
   -p 443:443 \
   -v "$(pwd)/nginx/http.conf:/etc/nginx/conf.d/http.conf:ro" \
   -v "$(pwd)/nginx/stream.stream:/etc/nginx/conf.d/stream.stream:ro" \
+  muwn/nginx:latest
+```
+
+## OSS 文件缓存定义
+
+`http.conf` 中已经包含下面这条缓存区定义：
+
+```nginx
+proxy_cache_path /var/cache/nginx/oss levels=1:2 keys_zone=oss_file_cache:100m max_size=10g inactive=7d use_temp_path=off;
+```
+
+这样做的好处是：
+
+- 基础镜像只提供缓存能力，不强绑定具体路由
+- 你可以在自己的 `server` / `location` 中按需启用
+- 同一个缓存区可以被多个文件下载 location 复用
+
+如果你要在某个文件下载路径启用缓存，可以在你自己的站点配置中引用：
+
+```nginx
+location /oss/ {
+    proxy_pass https://static.example.com/;
+    proxy_set_header Host static.example.com;
+    proxy_set_header Connection "";
+
+    proxy_http_version 1.1;
+    proxy_buffering on;
+    proxy_request_buffering on;
+
+    proxy_cache oss_file_cache;
+    proxy_cache_methods GET HEAD;
+    proxy_cache_key "$scheme$proxy_host$request_uri";
+    proxy_cache_lock on;
+    proxy_cache_lock_timeout 10s;
+    proxy_cache_revalidate on;
+    proxy_cache_background_update on;
+    proxy_cache_use_stale error timeout invalid_header updating http_500 http_502 http_503 http_504;
+
+    proxy_cache_valid 200 206 301 302 1h;
+    proxy_cache_valid 404 10m;
+
+    add_header X-Proxy-Cache $upstream_cache_status always;
+    expires 1h;
+    add_header Cache-Control "public, max-age=3600" always;
+}
+```
+
+如果你需要持久化缓存文件，建议额外挂载缓存目录：
+
+```shell
+mkdir -p ./cache/nginx/oss
+
+docker run -d \
+  --name nginx \
+  -p 80:80 \
+  -p 443:443 \
+  -v "$(pwd)/nginx/http.conf:/etc/nginx/conf.d/http.conf:ro" \
+  -v "$(pwd)/cache/nginx/oss:/var/cache/nginx/oss" \
   muwn/nginx:latest
 ```
 

@@ -46,6 +46,14 @@ RUN set -eux; \
     '}' \
     >> /etc/nginx/nginx.conf
 
+# 关闭 Nginx 版本信息
+RUN set -eux; \
+    sed -i '/http {/a\    server_tokens off;' /etc/nginx/nginx.conf
+
+# 为访问日志显式增加 stdout 输出，避免挂载 /var/log/nginx 后丢失 docker logs
+RUN set -eux; \
+    sed -i '/access_log /a\    access_log /dev/stdout main;' /etc/nginx/nginx.conf
+
 # 为错误日志显式增加 stderr 输出，避免挂载 /var/log/nginx 后丢失 docker logs
 RUN set -eux; \
     sed -i '/error_log /a\error_log /dev/stderr notice;' /etc/nginx/nginx.conf
